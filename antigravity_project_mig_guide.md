@@ -105,3 +105,21 @@ supabase login
 
 Write-Host "✅ 복구가 완료되었습니다. 이제 에이전트와 완벽하게 동일한 환경에서 작업하실 수 있습니다!" -ForegroundColor Green
 ```
+
+---
+
+## 🛠️ 6️⃣ 최종 점검 및 잠재적 이슈 대응 방안 (Troubleshooting)
+
+이전을 완료한 후 스크립트 실행이나 구동 중에 발생할 수 있는 잠재적인 문제와 모범 해결책입니다.
+
+1. **윈도우 계정명(Username) 변경으로 인한 절대 경로 오류**
+   - 기존 PC에서는 `C:\Users\1` 경로를 사용했습니다. 새 PC의 사용자 이름(예: `C:\Users\Admin`)이 다를 경우, 프로젝트 내의 세팅 파일이나 `.env`에 설정된 **절대 경로(Absolute Path)**가 하드코딩되어 있다면 연동 에러가 발생할 수 있습니다. `mcp_config.json` 등 로컬 설정 파일에 하드코딩된 경로가 없는지 체크하고 새 계정명으로 변경해 주세요.
+
+2. **Supabase 로컬 개발 서버용 Docker Desktop 확인**
+   - 만약 원격 클라우드 DB 연동(supabase login)이 아닌 로컬에서 `supabase start` 명령어로 자체 DB 컨테이너를 구동하며 개발하셨다면, 새 PC 환경에도 반드시 **Docker Desktop**이 설치되어 실행 중이어야 합니다.
+
+3. **Python 가상 환경(Virtualenv) 분리 사용 권장**
+   - 글로벌 파이썬 환경에 그대로 의존성을 깔면 향후 패키지 버전 충돌이 일어날 수 있습니다. 새 PC의 프로젝트 폴더 내 터미널에서 `python -m venv venv` 로 전용 가상 환경을 생성하고 활성화(`. venv/Scripts/activate`)하신 뒤, 스크립트용 패키지를 설치하시는 것을 강력히 권장합니다.
+
+4. **정확한 프론트엔드 패키지 매니저 사용 (npm vs yarn vs pnpm)**
+   - 복구 스크립트에는 편의상 `npm install`로 기재해 두었지만, 기존 환경에서 `yarn.lock` 이나 `pnpm-lock.yaml`을 기준으로 라이브러리를 관리하셨다면 새 PC에서도 동일하게 `yarn install` 또는 `pnpm install`을 실행해야 모듈 버전 충돌이나 버그를 예방할 수 있습니다.
