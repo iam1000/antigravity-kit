@@ -11,14 +11,21 @@
 | 브랜치 이름 | 역할 및 특징 |
 | :--- | :--- |
 | **`main`** | **[실제 배포용 / 운영 환경]**<br>가장 안정적인 코드가 유지되어야 하는 브랜치입니다. 개발자가 로컬에서 직접 커밋을 올리지 않으며, 반드시 `dev` 브랜치에서 검증이 끝난 후 병합(Merge)만 이루어집니다. |
-| **`dev`** | **[개발 및 테스트 환경]**<br>새로운 기능 개발 로직, 버그 픽스 등이 자유롭게 테스트되는 기본 작업 브랜치입니다. 로컬 작업 후 원격(GitHub)의 `dev` 브랜치로 푸시합니다. |
-
-*(추가 권장사항)* 기능 단위의 작업이 커질 경우 `feature/login`, `feature/ui-fix` 와 같이 `dev`에서 파생된 하위 브랜치를 사용하여 작업 후 `dev`로 병합하는 방식을 도입할 수도 있습니다.
+| **`dev`** | **[개발 및 테스트 환경]**<br>새로운 기능들(`feature`)이 모이는 통합 개발 브랜치입니다. `main`으로 가기 전 마지막 테스트를 거칩니다. |
+| **`feature/*`** | **[개별 기능 개발용]**<br>새로운 기능을 개발하거나 버그를 수정할 때 임시로 사용하는 브랜치입니다. 작업이 완료되면 `dev` 브랜치로 병합(Pull Request)하고 삭제합니다. |
 
 ---
 
 ## 3. 초기 설정 (Transition Guide)
 현재 `main` 브랜치만 있는 상태에서 `dev` 브랜치를 생성하고 적용하는 초기 1회 설정 방법입니다.
+
+0. **로컬에서 현재 브랜치 확인**
+   ```bash
+   git branch
+   ```
+   > * dev
+  main
+
 
 1. **로컬에서 최신 `main` 브랜치 확인**
    ```bash
@@ -39,22 +46,32 @@
 
 ---
 
-## 4. 일상적인 개발 프로세스 (Daily Workflow)
+## 4. 일상적인 개발 프로세스 (`feature` 브랜치 활용)
 
-### Step 1. 개발 작업 시작 전
-항상 자신이 `dev` 브랜치에 있는지 확인하고, 동료의 최신 업데이트를 내려받습니다.
+`dev` 브랜치에 직접 커밋하는 대신, 안전하게 격리된 `feature` 브랜치에서 작업하는 것이 원칙입니다.
+
+### Step 1. 최신 `dev` 동기화 및 기능 브랜치 생성
+항상 `dev` 브랜치의 최신 상태에서 새로운 `feature` 브랜치를 파생시킵니다.
 ```bash
-git branch       # 현재 브랜치가 * dev 인지 확인
-git pull         # 최신 코드 동기화
+git checkout dev
+git pull origin dev
+git checkout -b feature/login-ui   # 예: feature/[기능명]
 ```
 
 ### Step 2. 로컬 코드 작성 및 커밋
-코드를 수정/작성한 후 `dev` 브랜치에 커밋과 푸시를 진행합니다.
+코드를 수정/작성한 후 현재 `feature` 브랜치에 커밋하고 푸시합니다.
 ```bash
 git add .
 git commit -m "feat: [기능 설명] 추가"
-git push
+git push -u origin feature/login-ui
 ```
+
+### Step 3. GitHub에서 `feature` -> `dev` 병합 (Pull Request)
+작업이 끝난 `feature` 브랜치는 터미널에서 강제로 합치지 않고, GitHub 웹에서 코드 리뷰와 함께 병합합니다.
+1. GitHub 웹페이지 접속 후 **[Compare & pull request]** 클릭
+2. **`base`: `dev` ← `compare`: `feature/login-ui`** 로 설정
+3. 리뷰어가 코드를 점검한 후 **Merge pull request** 처리
+4. 병합 후, 원격의 `feature/login-ui` 브랜치는 삭제 (Delete branch) 처리하여 깔끔하게 유지합니다.
 
 ---
 
